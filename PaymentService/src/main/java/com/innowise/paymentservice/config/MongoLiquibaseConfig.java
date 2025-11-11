@@ -6,6 +6,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import static com.innowise.paymentservice.config.AppConst.ARG_CHANGELOG_FILE;
+import static com.innowise.paymentservice.config.AppConst.ARG_URL;
+import static com.innowise.paymentservice.config.AppConst.COMMAND_UPDATE;
+
 /**
  * @ClassName Mongo
  * @Description Executes Liquibase migrations for MongoDB on application startup,
@@ -26,10 +30,10 @@ public class MongoLiquibaseConfig implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        CommandScope liquibaseCommand = new CommandScope("update");
+        CommandScope liquibaseCommand = new CommandScope(COMMAND_UPDATE);
 
-        liquibaseCommand.addArgumentValue("changelogFile", changelogFile);
-        liquibaseCommand.addArgumentValue("url", mongoUri);
+        liquibaseCommand.addArgumentValue(ARG_CHANGELOG_FILE, changelogFile);
+        liquibaseCommand.addArgumentValue(ARG_URL, mongoUri);
 
         liquibaseCommand.execute();
     }

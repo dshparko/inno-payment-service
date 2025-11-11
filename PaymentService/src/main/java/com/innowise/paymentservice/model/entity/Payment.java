@@ -1,8 +1,8 @@
 package com.innowise.paymentservice.model.entity;
 
 import com.innowise.paymentservice.model.PaymentStatus;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -23,8 +23,8 @@ import java.time.Instant;
  */
 @Getter
 @Setter
-@Builder
 @Document(collection = "payments")
+@NoArgsConstructor
 public class Payment {
 
     @Id
