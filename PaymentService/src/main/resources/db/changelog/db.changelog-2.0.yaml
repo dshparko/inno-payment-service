@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-sample-documents
+      author: dshparko
+      changes:
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 1,
+                "user_id": 1,
+                "status": "SUCCESS",
+                "timestamp": { "$date": "2025-11-05T13:00:00Z" },
+                "payment_amount": 150.75
+              }
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 2,
+                "user_id": 1,
+                "status": "FAILED",
+                "timestamp": { "$date": "2025-11-06T09:30:00Z" },
+                "payment_amount": 89.99
+              }
+
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 3,
+                "user_id": 2,
+                "status": "SUCCESS",
+                "timestamp": { "$date": "2025-11-07T15:45:00Z" },
+                "payment_amount": 230.00
+              }
+
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 4,
+                "user_id": 3,
+                "status": "FAILED",
+                "timestamp": { "$date": "2025-11-08T11:20:00Z" },
+                "payment_amount": 15.50
+              }
+
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 5,
+                "user_id": 2,
+                "status": "SUCCESS",
+                "timestamp": { "$date": "2025-11-09T18:00:00Z" },
+                "payment_amount": 499.99
+              }
+
+        - insertOne:
+            collectionName: payments
+            document: >
+              {
+                "order_id": 6,
+                "user_id": 4,
+                "status": "FAILED",
+                "timestamp": { "$date": "2025-11-10T07:10:00Z" },
+                "payment_amount": 120.00
+              }
