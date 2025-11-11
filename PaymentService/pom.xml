@@ -115,7 +115,6 @@
                     <target>${java.version}</target>
                     <release>${java.version}</release>
                     <compilerArgs>
-                        <arg>--enable-preview</arg>
                         <arg>-Amapstruct.defaultComponentModel=spring</arg>
                     </compilerArgs>
                     <annotationProcessorPaths>
