@@ -9,7 +9,8 @@ import reactor.test.StepVerifier;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class RandomNumberServiceImplTest {
 
