@@ -3,7 +3,6 @@ package com.innowise.paymentservice.producer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.paymentservice.model.dto.PaymentEvent;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
  * @since 06.11.2025
  */
 @Service
-@RequiredArgsConstructor
 public class PaymentProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentProducer.class);
@@ -27,8 +25,15 @@ public class PaymentProducer {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${spring.kafka.topics.create-payment}")
-    private String createPaymentTopic;
+    private final String createPaymentTopic;
+
+    public PaymentProducer(KafkaTemplate<String, String> kafkaTemplate,
+                           ObjectMapper objectMapper,
+                           @Value("${spring.kafka.topics.create-payment}") String createPaymentTopic) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.objectMapper = objectMapper;
+        this.createPaymentTopic = createPaymentTopic;
+    }
 
     public void sendCreatePayment(PaymentEvent event) {
         try {

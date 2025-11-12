@@ -27,14 +27,10 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-    @Value("${spring.kafka.consumer.group-id}")
-    private String groupId;
-
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate() {
+    public KafkaTemplate<String, String> kafkaTemplate(
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
+
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -44,28 +40,28 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> orderEventKafkaListenerContainerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> orderEventKafkaListenerContainerFactory(
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers,
+            @Value("${spring.kafka.consumer.group-id}") String groupId) {
+
         JsonDeserializer<OrderEvent> deserializer = new JsonDeserializer<>(OrderEvent.class);
         deserializer.addTrustedPackages("com.innowise.paymentservice.model.dto");
         deserializer.setRemoveTypeHeaders(false);
         deserializer.setUseTypeMapperForKey(true);
 
-        DefaultKafkaConsumerFactory<String, OrderEvent> consumerFactory = getStringOrderEventDefaultKafkaConsumerFactory(deserializer);
-
-        ConcurrentKafkaListenerContainerFactory<String, OrderEvent> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-        return factory;
-    }
-
-    private DefaultKafkaConsumerFactory<String, OrderEvent> getStringOrderEventDefaultKafkaConsumerFactory(JsonDeserializer<OrderEvent> deserializer) {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.innowise.paymentservice.model.dto");
 
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+        DefaultKafkaConsumerFactory<String, OrderEvent> consumerFactory =
+                new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+
+        ConcurrentKafkaListenerContainerFactory<String, OrderEvent> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
     }
 
 }
