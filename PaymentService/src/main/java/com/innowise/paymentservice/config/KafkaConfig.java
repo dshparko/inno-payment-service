@@ -27,14 +27,20 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
+    private static final String AUTO_OFFSET_RESET = "latest";
+    private static final String TRUSTED_PACKAGE = "com.innowise.paymentservice.model.dto";
+
+    private static final Class<?> KEY_SERIALIZER = StringSerializer.class;
+    private static final Class<?> VALUE_SERIALIZER = StringSerializer.class;
+
     @Bean
     public KafkaTemplate<String, String> kafkaTemplate(
             @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
 
         Map<String, Object> config = new HashMap<>();
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, KEY_SERIALIZER);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, VALUE_SERIALIZER);
 
         return new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(config));
     }
@@ -45,15 +51,15 @@ public class KafkaConfig {
             @Value("${spring.kafka.consumer.group-id}") String groupId) {
 
         JsonDeserializer<OrderEvent> deserializer = new JsonDeserializer<>(OrderEvent.class);
-        deserializer.addTrustedPackages("com.innowise.paymentservice.model.dto");
+        deserializer.addTrustedPackages(TRUSTED_PACKAGE);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.setUseTypeMapperForKey(true);
 
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, "com.innowise.paymentservice.model.dto");
+        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET);
+        config.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_PACKAGE);
 
         DefaultKafkaConsumerFactory<String, OrderEvent> consumerFactory =
                 new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
@@ -65,5 +71,3 @@ public class KafkaConfig {
     }
 
 }
-
-
