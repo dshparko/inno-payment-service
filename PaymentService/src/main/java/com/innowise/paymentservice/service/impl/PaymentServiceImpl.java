@@ -40,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getByOrderId(Long orderId) {
-        return paymentRepository.findByOrderId(String.valueOf(orderId))
+        return paymentRepository.findByOrderId(orderId)
                 .stream()
                 .map(paymentMapper::toDto)
                 .toList();
@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getByUserId(Long userId) {
-        return paymentRepository.findByUserId(String.valueOf(userId))
+        return paymentRepository.findByUserId(userId)
                 .stream()
                 .map(paymentMapper::toDto)
                 .toList();
@@ -56,8 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<PaymentDto> getByStatuses(Set<PaymentStatus> statuses) {
-        List<String> statusNames = statuses.stream()
-                .map(Enum::name)
+        List<PaymentStatus> statusNames = statuses.stream()
                 .toList();
 
         return paymentRepository.findByStatusIn(statusNames)

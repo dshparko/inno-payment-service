@@ -1,5 +1,6 @@
 package com.innowise.paymentservice.repository;
 
+import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.entity.Payment;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -32,7 +33,7 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
      * @param orderId the order ID to filter by
      * @return list of matching payments
      */
-    List<Payment> findByOrderId(String orderId);
+    List<Payment> findByOrderId(Long orderId);
 
     /**
      * Retrieves all payments made by a specific user.
@@ -40,7 +41,7 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
      * @param userId the user ID to filter by
      * @return list of matching payments
      */
-    List<Payment> findByUserId(String userId);
+    List<Payment> findByUserId(Long userId);
 
     /**
      * Retrieves all payments whose status matches any of the provided values.
@@ -48,7 +49,7 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
      * @param statuses list of status values to filter by
      * @return list of matching payments
      */
-    List<Payment> findByStatusIn(List<String> statuses);
+    List<Payment> findByStatusIn(List<PaymentStatus> statuses);
 
     /**
      * Retrieves all payments made within a specific time range.

@@ -58,7 +58,7 @@ class PaymentServiceImplTest {
         Payment entity = new Payment();
         PaymentDto dto = PaymentDto.builder().orderId(1L).build();
 
-        when(paymentRepository.findByOrderId("1")).thenReturn(List.of(entity));
+        when(paymentRepository.findByOrderId(1L)).thenReturn(List.of(entity));
         when(paymentMapper.toDto(entity)).thenReturn(dto);
 
         List<PaymentDto> result = paymentService.getByOrderId(1L);
@@ -71,7 +71,7 @@ class PaymentServiceImplTest {
         Payment entity = new Payment();
         PaymentDto dto = PaymentDto.builder().userId(2L).build();
 
-        when(paymentRepository.findByUserId("2")).thenReturn(List.of(entity));
+        when(paymentRepository.findByUserId(2L)).thenReturn(List.of(entity));
         when(paymentMapper.toDto(entity)).thenReturn(dto);
 
         List<PaymentDto> result = paymentService.getByUserId(2L);
@@ -84,7 +84,7 @@ class PaymentServiceImplTest {
         Payment entity = new Payment();
         PaymentDto dto = PaymentDto.builder().status(PaymentStatus.FAILED).build();
 
-        when(paymentRepository.findByStatusIn(List.of("FAILED"))).thenReturn(List.of(entity));
+        when(paymentRepository.findByStatusIn(List.of(PaymentStatus.FAILED))).thenReturn(List.of(entity));
         when(paymentMapper.toDto(entity)).thenReturn(dto);
 
         List<PaymentDto> result = paymentService.getByStatuses(Set.of(PaymentStatus.FAILED));
