@@ -1,6 +1,6 @@
 package com.innowise.paymentservice.service.impl;
 
-import com.innowise.paymentservice.service.RandomNumberClient;
+import com.innowise.paymentservice.config.RandomNumberClient;
 import com.innowise.paymentservice.service.RandomNumberService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

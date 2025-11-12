@@ -1,6 +1,6 @@
 package com.innowise.paymentservice.service.impl;
 
-import com.innowise.paymentservice.service.RandomNumberClient;
+import com.innowise.paymentservice.config.RandomNumberClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

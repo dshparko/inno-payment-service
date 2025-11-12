@@ -1,4 +1,4 @@
-package com.innowise.paymentservice.service;
+package com.innowise.paymentservice.config;
 
 
 import org.springframework.beans.factory.annotation.Value;
