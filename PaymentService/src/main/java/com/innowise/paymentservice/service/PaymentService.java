@@ -80,4 +80,13 @@ public interface PaymentService {
      */
     BigDecimal getTotalBetween(Instant from, Instant to);
 
+    /**
+     * Checks whether the specified order has already been processed.
+     *
+     *
+     * @param orderId the unique identifier of the order to check; must not be {@code null}
+     * @return {@code true} if the order has already been processed; {@code false} otherwise
+     */
+    boolean isAlreadyProcessed(Long orderId);
+
 }

@@ -31,7 +31,15 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
 
     @Override
+    public boolean isAlreadyProcessed(Long orderId) {
+        return paymentRepository.existsByOrderId(orderId);
+    }
+
+    @Override
     public PaymentDto create(PaymentDto request) {
+        if (isAlreadyProcessed(request.getOrderId())) {
+            throw new IllegalStateException("Order " + request.getOrderId() + " already processed");
+        }
         Payment payment = paymentMapper.toEntity(request);
 
         Payment saved = paymentRepository.save(payment);

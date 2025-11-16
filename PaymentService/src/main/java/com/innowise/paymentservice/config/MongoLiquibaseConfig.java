@@ -1,43 +1,105 @@
 package com.innowise.paymentservice.config;
 
-import liquibase.command.CommandScope;
+import com.mongodb.ConnectionString;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
+import liquibase.Contexts;
+import liquibase.LabelExpression;
+import liquibase.Liquibase;
+import liquibase.exception.LiquibaseException;
+import liquibase.ext.mongodb.database.MongoLiquibaseDatabase;
+import liquibase.ext.mongodb.database.MongoConnection;
+import liquibase.resource.ClassLoaderResourceAccessor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import static com.innowise.paymentservice.config.AppConst.ARG_CHANGELOG_FILE;
-import static com.innowise.paymentservice.config.AppConst.ARG_URL;
-import static com.innowise.paymentservice.config.AppConst.COMMAND_UPDATE;
-
-/**
- * @ClassName Mongo
- * @Description Executes Liquibase migrations for MongoDB on application startup,
- * only if Liquibase is explicitly enabled via configuration
- * @Author dshparko
- * @Date 05.11.2025 14:54
- * @Version 1.0
- */
+@Slf4j
 @Component
 @ConditionalOnProperty(prefix = "spring.liquibase", name = "enabled", havingValue = "true")
 public class MongoLiquibaseConfig implements CommandLineRunner {
 
-    @Value("${spring.liquibase.change-log}")
-    private String changelogFile;
-
     @Value("${spring.data.mongodb.uri}")
     private String mongoUri;
 
+    @Value("${spring.liquibase.change-log}")
+    private String changelogFile;
+
     @Override
     public void run(String... args) throws Exception {
-        CommandScope liquibaseCommand = new CommandScope(COMMAND_UPDATE);
+        validateChangelogExists();
 
-        liquibaseCommand.addArgumentValue(ARG_CHANGELOG_FILE, changelogFile);
-        liquibaseCommand.addArgumentValue(ARG_URL, mongoUri);
+        MongoClient mongoClient = createMongoClient();
+        try {
+            String dbName = extractDatabaseName();
 
-        liquibaseCommand.execute();
+            MongoDatabase mongoDatabase = getMongoDatabase(mongoClient, dbName);
+
+            Liquibase liquibase = createLiquibase(mongoClient, mongoDatabase);
+
+            runMigrations(liquibase);
+
+        } finally {
+            closeMongoClient(mongoClient);
+        }
+
+    }
+
+    private void validateChangelogExists() {
+        if (!new ClassPathResource(changelogFile).exists()) {
+            throw new IllegalStateException(
+                    "Changelog file not found on classpath: " + changelogFile
+            );
+        }
+    }
+
+    private MongoClient createMongoClient() {
+        return MongoClients.create(mongoUri);
+    }
+
+    private String extractDatabaseName() {
+        ConnectionString cs = new ConnectionString(mongoUri);
+        String databaseName = cs.getDatabase();
+
+        if (databaseName == null) {
+            throw new IllegalStateException(
+                    "MongoDB URI must include database name, e.g. mongodb://host:27017/paymentdb"
+            );
+        }
+
+        return databaseName;
+    }
+
+    private MongoDatabase getMongoDatabase(MongoClient mongoClient, String dbName) {
+        return mongoClient.getDatabase(dbName);
+    }
+
+
+    private Liquibase createLiquibase(MongoClient mongoClient, MongoDatabase mongoDatabase) {
+        MongoConnection connection = new MongoConnection();
+        connection.setMongoClient(mongoClient);
+        connection.setMongoDatabase(mongoDatabase);
+
+        MongoLiquibaseDatabase database = new MongoLiquibaseDatabase();
+        database.setConnection(connection);
+
+        return new Liquibase(
+                changelogFile,
+                new ClassLoaderResourceAccessor(),
+                database
+        );
+    }
+
+    private void runMigrations(Liquibase liquibase) throws LiquibaseException {
+        liquibase.update(new Contexts(), new LabelExpression());
+    }
+
+    private void closeMongoClient(MongoClient mongoClient) {
+        mongoClient.close();
     }
 
 }
-
-

@@ -8,6 +8,6 @@ public final class AppConst {
 
     public static final String COMMAND_UPDATE = "update";
     public static final String ARG_CHANGELOG_FILE = "changelogFile";
-    public static final String ARG_URL = "url";
+    public static final String ARG_URL = "database";
 
 }

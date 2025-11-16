@@ -71,4 +71,13 @@ public interface PaymentRepository extends MongoRepository<Payment, ObjectId> {
     @Query(value = "{ 'timestamp': { $gte: ?0, $lte: ?1 } }", fields = "{ paymentAmount: 1 }")
     List<Payment> findAmountsByTimestampBetween(Instant from, Instant to);
 
+    /**
+     * Checks whether a record with the specified order ID exists.
+     *
+     *
+     * @param orderId the ID of the order to check; must not be {@code null}
+     * @return {@code true} if an entity with the given order ID exists; {@code false} otherwise
+     */
+    boolean existsByOrderId(Long orderId);
+
 }

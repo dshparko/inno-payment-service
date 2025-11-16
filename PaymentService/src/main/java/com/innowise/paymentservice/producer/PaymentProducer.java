@@ -1,7 +1,5 @@
 package com.innowise.paymentservice.producer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.paymentservice.model.dto.PaymentEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,29 +20,26 @@ public class PaymentProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentProducer.class);
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
-
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String createPaymentTopic;
 
-    public PaymentProducer(KafkaTemplate<String, String> kafkaTemplate,
-                           ObjectMapper objectMapper,
+    public PaymentProducer(KafkaTemplate<String, Object> kafkaTemplate,
                            @Value("${spring.kafka.topics.create-payment}") String createPaymentTopic) {
         this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
         this.createPaymentTopic = createPaymentTopic;
     }
 
     public void sendCreatePayment(PaymentEvent event) {
-        try {
-            String payload = objectMapper.writeValueAsString(event);
-            kafkaTemplate.send(createPaymentTopic, payload);
-            logger.info("Sent CREATE_PAYMENT event to topic '{}': {}", createPaymentTopic, payload);
-        } catch (JsonProcessingException e) {
-            String context = String.format("Failed to serialize PaymentEvent for orderId=%s, userId=%s, status=%s",
-                    event.getOrderId(), event.getPaymentId(), event.getStatus());
-            throw new IllegalStateException(context, e);
-        }
+        kafkaTemplate.send(createPaymentTopic, String.valueOf(event.getPaymentId()), event)
+                .whenComplete((result, ex) -> {
+                    if (ex == null) {
+                        logger.info("Sent create_payment event [paymentId={}] to topic '{}'",
+                                event.getPaymentId(), createPaymentTopic);
+                    } else {
+                        logger.error("Failed to send create_payment event [paymentId={}]",
+                                event.getPaymentId(), ex);
+                    }
+                });
     }
 
 }
