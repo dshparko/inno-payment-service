@@ -20,6 +20,7 @@ import java.util.Set;
  * @ClassName PaymentService
  * @Description Service interface for managing payment operations.
  * @Author dshparko
+ *
  * @Date 05.11.2025 17:41
  * @Version 1.0
  */
@@ -27,6 +28,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
+    public static final String PAYMENT = "PAYMENT-";
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
 
@@ -82,11 +84,18 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     public PaymentDto processOrderEvent(OrderEvent event, boolean isEven) {
+        if (event == null || event.getOrderId() == null || event.getUserId() == null || event.getAmount() == null) {
+            throw new IllegalArgumentException("Invalid OrderEvent: missing required fields");
+        }
+
         PaymentStatus status = isEven ? PaymentStatus.SUCCESS : PaymentStatus.FAILED;
+        String paymentId = generatePaymentId(event.getOrderId());
 
         PaymentDto dto = PaymentDto.builder()
+                .paymentId(paymentId)
                 .orderId(event.getOrderId())
                 .userId(event.getUserId())
+                .paymentAmount(event.getAmount())
                 .status(status)
                 .timestamp(Instant.now())
                 .build();
@@ -94,8 +103,14 @@ public class PaymentServiceImpl implements PaymentService {
         return create(dto);
     }
 
+
     public PaymentEvent toPaymentEvent(PaymentDto dto) {
         return new PaymentEvent(dto.getOrderId(), dto.getOrderId(), dto.getStatus());
     }
+
+    private String generatePaymentId(Long orderId) {
+        return PAYMENT + orderId;
+    }
+
 
 }

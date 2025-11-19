@@ -1,12 +1,13 @@
 package com.innowise.paymentservice.producer;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.dto.PaymentEvent;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,6 +32,7 @@ class PaymentProducerTest {
 
     private static final KafkaContainer KAFKA =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.0"));
+
 
     @DynamicPropertySource
     static void overrideKafkaProps(DynamicPropertyRegistry registry) {
@@ -68,7 +70,7 @@ class PaymentProducerTest {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
             consumer.subscribe(Collections.singletonList("create-payment-test"));

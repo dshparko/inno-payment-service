@@ -111,7 +111,7 @@ class PaymentServiceImplTest {
 
     @Test
     void processOrderEvent_shouldCreatePaymentWithCorrectStatus() {
-        OrderEvent event = new OrderEvent(1L, 2L, 3L);
+        OrderEvent event = new OrderEvent(1L, 2L, BigDecimal.TWO);
         PaymentDto dto = PaymentDto.builder().orderId(1L).userId(2L).status(PaymentStatus.SUCCESS).timestamp(Instant.now()).build();
 
         when(paymentMapper.toEntity(any())).thenReturn(new Payment());

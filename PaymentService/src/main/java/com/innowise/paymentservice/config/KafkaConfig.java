@@ -24,7 +24,6 @@ import java.util.Map;
 public class KafkaConfig {
 
     private static final String AUTO_OFFSET_RESET = "latest";
-    private static final String TRUSTED_PACKAGE = "com.innowise.paymentservice.model.dto";
 
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, OrderEvent> orderEventKafkaListenerContainerFactory(
@@ -32,15 +31,15 @@ public class KafkaConfig {
             @Value("${spring.kafka.consumer.group-id}") String groupId) {
 
         JsonDeserializer<OrderEvent> deserializer = new JsonDeserializer<>(OrderEvent.class);
-        deserializer.addTrustedPackages(TRUSTED_PACKAGE);
-        deserializer.setRemoveTypeHeaders(false);
-        deserializer.setUseTypeMapperForKey(true);
+        deserializer.addTrustedPackages("*");
+        deserializer.setRemoveTypeHeaders(true);
+        deserializer.setUseTypeMapperForKey(false);
+
 
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, AUTO_OFFSET_RESET);
-        config.put(JsonDeserializer.TRUSTED_PACKAGES, TRUSTED_PACKAGE);
 
         DefaultKafkaConsumerFactory<String, OrderEvent> consumerFactory =
                 new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);

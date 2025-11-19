@@ -4,8 +4,6 @@ import com.innowise.paymentservice.model.PaymentStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -27,9 +25,10 @@ import java.time.Instant;
 @NoArgsConstructor
 public class Payment {
 
-    @Id
-    private ObjectId id;
+    @Field("payment_id")
+    private String paymentId;
 
+    @Indexed
     @Field("order_id")
     private Long orderId;
 

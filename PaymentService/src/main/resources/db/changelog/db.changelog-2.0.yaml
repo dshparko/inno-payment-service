@@ -7,6 +7,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-1", 
                 "order_id": 1,
                 "user_id": 1,
                 "status": "SUCCESS",
@@ -17,6 +18,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-2", 
                 "order_id": 2,
                 "user_id": 1,
                 "status": "FAILED",
@@ -28,6 +30,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-3", 
                 "order_id": 3,
                 "user_id": 2,
                 "status": "SUCCESS",
@@ -39,6 +42,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-4", 
                 "order_id": 4,
                 "user_id": 3,
                 "status": "FAILED",
@@ -50,6 +54,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-5", 
                 "order_id": 5,
                 "user_id": 2,
                 "status": "SUCCESS",
@@ -61,6 +66,7 @@ databaseChangeLog:
             collectionName: payments
             document: >
               {
+                "payment_id": "PAYMENT-6", 
                 "order_id": 6,
                 "user_id": 4,
                 "status": "FAILED",

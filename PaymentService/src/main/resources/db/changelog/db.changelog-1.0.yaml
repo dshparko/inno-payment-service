@@ -11,6 +11,11 @@ databaseChangeLog:
       changes:
         - createIndex:
             collectionName: payments
+            keys: '{order_id: 1}'
+            options: '{name: "idx_order_id"}'
+
+        - createIndex:
+            collectionName: payments
             keys: '{user_id: 1}'
             options: '{name: "idx_user_id"}'
 

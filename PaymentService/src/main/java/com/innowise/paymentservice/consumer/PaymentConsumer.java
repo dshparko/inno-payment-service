@@ -32,17 +32,23 @@ public class PaymentConsumer {
     @KafkaListener(topics = "${spring.kafka.topics.create-order}", groupId = "payment-group")
     public void listen(OrderEvent event) {
         logger.info("Received CREATE_ORDER event: {}", event);
+
         if (paymentService.isAlreadyProcessed(event.getOrderId())) {
             logger.warn("Duplicate event detected, skipping: {}", event.getOrderId());
             return;
         }
-        randomNumberService.isEven().subscribe(isEven -> {
+
+        try {
+            boolean isEven = randomNumberService.isEven().blockOptional().orElse(false);
+
             PaymentDto saved = paymentService.processOrderEvent(event, isEven);
             PaymentEvent paymentEvent = paymentService.toPaymentEvent(saved);
 
             paymentEventProducer.sendCreatePayment(paymentEvent);
             logger.info("Sent CREATE_PAYMENT event: {}", paymentEvent);
-        });
+        } catch (Exception ex) {
+            logger.error("Error while processing order event", ex);
+        }
     }
 }
 

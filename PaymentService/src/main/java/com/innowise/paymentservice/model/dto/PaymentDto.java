@@ -23,9 +23,12 @@ import java.time.Instant;
 public class PaymentDto {
 
     @NotBlank
+    private String paymentId;
+
+    @NotNull
     private Long orderId;
 
-    @NotBlank
+    @NotNull
     private Long userId;
 
     @NotNull
