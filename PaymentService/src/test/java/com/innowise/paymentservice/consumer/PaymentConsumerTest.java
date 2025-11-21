@@ -23,6 +23,8 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,4 +86,25 @@ class PaymentConsumerTest {
         verify(paymentService, times(1)).toPaymentEvent(paymentDto);
         verify(paymentProducer, times(1)).sendCreatePayment(paymentEvent);
     }
+
+    @Test
+    void shouldSkipDuplicateOrderEvent() {
+        // given
+        OrderEvent orderEvent = new OrderEvent();
+        orderEvent.setOrderId(999L);
+        orderEvent.setUserId(111L);
+        orderEvent.setAmount(BigDecimal.ONE);
+
+        when(paymentService.isAlreadyProcessed(orderEvent.getOrderId())).thenReturn(true);
+
+        // when
+        paymentConsumer.listen(orderEvent);
+
+        // then: остальные методы НЕ вызываются
+        verify(paymentService, times(1)).isAlreadyProcessed(orderEvent.getOrderId());
+        verify(paymentService, times(0)).processOrderEvent(any(), anyBoolean());
+        verify(paymentService, times(0)).toPaymentEvent(any());
+        verify(paymentProducer, times(0)).sendCreatePayment(any());
+    }
+
 }

@@ -95,4 +95,26 @@ class PaymentProducerTest {
             assertThat(received.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
         }
     }
+
+    @Test
+    void shouldSkipInvalidEvent() {
+        PaymentEvent invalidEvent = new PaymentEvent(null, null, null);
+
+        paymentProducer.sendCreatePayment(invalidEvent);
+
+        Properties props = new Properties();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KAFKA.getBootstrapServers());
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group-invalid");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+        try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
+            consumer.subscribe(Collections.singletonList("create-payment-test"));
+
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(3));
+            assertThat(records.count()).isZero();
+        }
+    }
+
 }
