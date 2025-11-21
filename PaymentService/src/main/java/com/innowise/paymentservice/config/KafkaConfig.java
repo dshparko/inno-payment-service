@@ -1,6 +1,7 @@
 package com.innowise.paymentservice.config;
 
 import com.innowise.paymentservice.model.dto.OrderEvent;
+import com.innowise.paymentservice.model.dto.PaymentEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -37,6 +38,18 @@ public class KafkaConfig {
     @Bean
     public KafkaTemplate<String, OrderEvent> orderEventKafkaTemplate(
             ProducerFactory<String, OrderEvent> producerFactory) {
+        return new KafkaTemplate<>(producerFactory);
+    }
+
+    @Bean
+    public ProducerFactory<String, PaymentEvent> paymentEventProducerFactory(
+            @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
+        return new DefaultKafkaProducerFactory<>(commonProducerConfigs(bootstrapServers));
+    }
+
+    @Bean
+    public KafkaTemplate<String, PaymentEvent> paymentEventKafkaTemplate(
+            ProducerFactory<String, PaymentEvent> producerFactory) {
         return new KafkaTemplate<>(producerFactory);
     }
 
