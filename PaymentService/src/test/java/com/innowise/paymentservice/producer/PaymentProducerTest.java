@@ -40,6 +40,7 @@ class PaymentProducerTest {
     static void overrideKafkaProps(DynamicPropertyRegistry registry) {
         registry.add("spring.kafka.bootstrap-servers", KAFKA::getBootstrapServers);
         registry.add("spring.kafka.topics.create-payment", () -> "create-payment-test");
+        registry.add("spring.kafka.topics.create-payment-empty", () -> "create-payment-test-empty");
     }
 
     @BeforeAll
@@ -110,7 +111,7 @@ class PaymentProducerTest {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
-            consumer.subscribe(Collections.singletonList("create-payment-test"));
+            consumer.subscribe(Collections.singletonList("create-payment-test-empty"));
 
             ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(3));
             assertThat(records.count()).isZero();
