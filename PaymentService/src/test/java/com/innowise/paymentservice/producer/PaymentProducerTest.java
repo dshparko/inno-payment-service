@@ -1,9 +1,10 @@
 package com.innowise.paymentservice.producer;
 
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.dto.PaymentEvent;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.KafkaContainer;
@@ -28,11 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @EnableKafka
+@ActiveProfiles("test")
 class PaymentProducerTest {
 
     private static final KafkaContainer KAFKA =
             new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.5.0"));
-
 
     @DynamicPropertySource
     static void overrideKafkaProps(DynamicPropertyRegistry registry) {
@@ -41,8 +43,15 @@ class PaymentProducerTest {
     }
 
     @BeforeAll
-    static void startKafka() {
+    static void startKafka() throws Exception {
         KAFKA.start();
+
+        try (AdminClient adminClient = AdminClient.create(
+                Collections.singletonMap("bootstrap.servers", KAFKA.getBootstrapServers()))) {
+            adminClient.createTopics(Collections.singletonList(
+                    new NewTopic("create-payment-test", 1, (short) 1)
+            )).all().get();
+        }
     }
 
     @AfterAll
@@ -70,7 +79,7 @@ class PaymentProducerTest {
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 
         try (KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props)) {
             consumer.subscribe(Collections.singletonList("create-payment-test"));
@@ -81,7 +90,8 @@ class PaymentProducerTest {
             ConsumerRecord<String, String> consumerRecord = records.iterator().next();
             PaymentEvent received = objectMapper.readValue(consumerRecord.value(), PaymentEvent.class);
 
-            assertThat(received.getOrderId()).isEqualTo(1L);
+            assertThat(received.getPaymentId()).isEqualTo(1L);
+            assertThat(received.getOrderId()).isEqualTo(100L);
             assertThat(received.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
         }
     }

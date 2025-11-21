@@ -1,6 +1,7 @@
 package com.innowise.paymentservice.consumer;
 
 
+import com.innowise.paymentservice.model.PaymentStatus;
 import com.innowise.paymentservice.model.dto.OrderEvent;
 import com.innowise.paymentservice.model.dto.PaymentDto;
 import com.innowise.paymentservice.model.dto.PaymentEvent;
@@ -12,12 +13,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 import static org.mockito.Mockito.times;
@@ -27,6 +30,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @EmbeddedKafka(partitions = 1, topics = "create-order")
+@ActiveProfiles("test")
 class PaymentConsumerTest {
 
     @DynamicPropertySource
@@ -52,10 +56,14 @@ class PaymentConsumerTest {
         OrderEvent orderEvent = new OrderEvent();
         orderEvent.setOrderId(123L);
         orderEvent.setUserId(456L);
+        orderEvent.setAmount(BigDecimal.TEN);
 
         PaymentDto paymentDto = PaymentDto.builder()
+                .paymentId("PAYMENT-1")
                 .orderId(123L)
                 .userId(456L)
+                .status(PaymentStatus.SUCCESS)
+                .paymentAmount(BigDecimal.TEN)
                 .timestamp(Instant.now())
                 .build();
 

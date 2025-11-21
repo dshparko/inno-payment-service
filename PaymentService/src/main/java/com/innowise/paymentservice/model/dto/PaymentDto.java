@@ -21,7 +21,6 @@ import java.time.Instant;
 @Getter
 @Builder
 public class PaymentDto {
-
     @NotBlank
     private String paymentId;
 
@@ -38,6 +37,6 @@ public class PaymentDto {
     @DecimalMin("0.01")
     private BigDecimal paymentAmount;
 
+    @NotNull
     private PaymentStatus status;
-
 }

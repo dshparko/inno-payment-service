@@ -1,6 +1,8 @@
 package com.innowise.paymentservice.model.dto;
 
 import com.innowise.paymentservice.model.PaymentStatus;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +12,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PaymentEvent {
 
-    private Long orderId;
+    @NotNull
+    @Min(1)
     private Long paymentId;
-    private PaymentStatus status;
 
+    @NotNull
+    @Min(1)
+    private Long orderId;
+
+    @NotNull
+    private PaymentStatus status;
 }
 
