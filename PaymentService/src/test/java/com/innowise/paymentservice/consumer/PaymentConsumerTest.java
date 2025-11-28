@@ -71,7 +71,7 @@ class PaymentConsumerTest {
 
         PaymentEvent paymentEvent = new PaymentEvent();
         paymentEvent.setOrderId(123L);
-        paymentEvent.setPaymentId(456L);
+        paymentEvent.setPaymentId("PAYMENT-456");
 
         when(randomNumberService.isEven()).thenReturn(Mono.just(true));
         when(paymentService.processOrderEvent(orderEvent, true)).thenReturn(paymentDto);

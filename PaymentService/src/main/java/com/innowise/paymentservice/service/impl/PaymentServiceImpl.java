@@ -105,7 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
 
 
     public PaymentEvent toPaymentEvent(PaymentDto dto) {
-        return new PaymentEvent(dto.getOrderId(), dto.getOrderId(), dto.getStatus());
+        return new PaymentEvent(dto.getPaymentId(), dto.getOrderId(), dto.getStatus());
     }
 
     private String generatePaymentId(Long orderId) {

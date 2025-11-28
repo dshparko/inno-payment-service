@@ -69,7 +69,7 @@ class PaymentProducerTest {
     @Test
     void shouldSendMessageToKafka() throws Exception {
         // given
-        PaymentEvent event = new PaymentEvent(1L, 100L, PaymentStatus.SUCCESS);
+        PaymentEvent event = new PaymentEvent("PAYMENT-1", 100L, PaymentStatus.SUCCESS);
 
         // when
         paymentProducer.sendCreatePayment(event);
@@ -91,7 +91,7 @@ class PaymentProducerTest {
             ConsumerRecord<String, String> consumerRecord = records.iterator().next();
             PaymentEvent received = objectMapper.readValue(consumerRecord.value(), PaymentEvent.class);
 
-            assertThat(received.getPaymentId()).isEqualTo(1L);
+            assertThat(received.getPaymentId()).isEqualTo("PAYMENT-1");
             assertThat(received.getOrderId()).isEqualTo(100L);
             assertThat(received.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
         }
