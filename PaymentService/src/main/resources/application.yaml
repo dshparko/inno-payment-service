@@ -37,16 +37,6 @@ server:
 random:
   api:
     url: ${RANDOM_API_UPL}
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
-  security:
-    enabled: false
 resilience4j:
   circuitbreaker:
     instances:
@@ -60,3 +50,18 @@ resilience4j:
         eventConsumerBufferSize: 10
         registerHealthIndicator: true
         permittedNumberOfCallsInHalfOpenState: 3
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
